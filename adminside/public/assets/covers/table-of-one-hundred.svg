@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Table Of One Hundred</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#251B2D"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D9A441" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#F6EFDF" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 690V346c0-156 126-282 282-282s282 126 282 282v344" stroke="#D9A441" stroke-width="42"/>
+    <path d="M278 690V366c0-95 62-157 147-157s147 62 147 157v324" stroke="#E84A7F" stroke-width="34" opacity=".9"/>
+    <path d="M728 690V250c0-87 70-157 157-157s157 70 157 157v440" stroke="#F6EFDF" stroke-width="22" opacity=".82"/>
+    <circle cx="884" cy="489" r="80" fill="#D9A441" opacity=".86"/>
+    <circle cx="884" cy="489" r="31" fill="#251B2D"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#E84A7F" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#251B2D"/>
+    <path d="M28 51V31" stroke="#251B2D" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#E84A7F" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

@@ -1,0 +1,45 @@
+<!--
+  404 screen of the staff console.
+
+  It uses the same console layout as every other staff page, so a wrong address
+  looks like a normal part of the console rather than an error page, and it
+  offers a route back to each of the three working screens.
+-->
+<section class="shell">
+  <div class="console-head">
+    <div>
+      <p class="eyebrow">Error 404</p>
+      <h1>That screen is not <em>in the console.</em></h1>
+      <p>
+        The address you followed does not match any route. Nothing has been changed in the
+        database - the console simply has no page for this URL.
+      </p>
+    </div>
+    <div class="button-row">
+      <a class="button button-primary" routerLink="/">Go to the dashboard</a>
+      <a class="button button-quiet" routerLink="/events/new">Create an event</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Where you can go instead</h2>
+        <p>The console keeps event management, event creation and category management on separate screens.</p>
+      </div>
+    </div>
+
+    <div class="console-empty">
+      <h3>Routes that exist</h3>
+      <p>
+        <code>/</code> lists every event, <code>/events/new</code> creates one,
+        <code>/events/:id/edit</code> updates one, and <code>/categories</code> manages the
+        categories used by the public search filter.
+      </p>
+      <div class="button-row">
+        <a class="button button-quiet" routerLink="/categories">Manage categories</a>
+        <a class="button button-quiet" routerLink="/">Back to the dashboard</a>
+      </div>
+    </div>
+  </div>
+</section>

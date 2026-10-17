@@ -1,0 +1,15 @@
+<!--
+  Root shell of the staff console.
+
+  The Header (with the shared Nav) and the Footer are declared here exactly once.
+  Every routed screen is projected into the router-outlet below, so the common
+  segments are literally shared by all pages - this is the fix for the Assessment
+  2 feedback about duplicating the header, nav and footer.
+-->
+<app-admin-header></app-admin-header>
+
+<main id="main-content" class="console-main">
+  <router-outlet></router-outlet>
+</main>
+
+<app-admin-footer></app-admin-footer>

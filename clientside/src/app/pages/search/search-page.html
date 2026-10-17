@@ -1,0 +1,195 @@
+<!-- Search page body. Chrome comes from the root shell. -->
+<section class="page-hero search-hero">
+  <div class="shell page-hero-grid">
+    <div>
+      <p class="eyebrow">Search the calendar</p>
+      <h1>Find your next <em>good thing.</em></h1>
+      <p>Use one filter or combine all three: event date, Sydney location and event category.</p>
+    </div>
+    <div class="page-hero-aside">
+      <span>Live events only</span>
+      <p>Results come from the published events API. Past, suspended and cancelled events are excluded automatically.</p>
+    </div>
+  </div>
+  <div class="search-route" aria-hidden="true"></div>
+</section>
+
+<section class="search-section section">
+  <div class="shell search-layout">
+    <aside class="filter-panel" aria-labelledby="filter-title">
+      <div class="filter-heading">
+        <div><p class="kicker">Refine results</p><h2 id="filter-title">Filter events</h2></div>
+        <button class="text-button" type="button" (click)="clearAll()">Clear all</button>
+      </div>
+
+      <form (submit)="$event.preventDefault(); onSubmit()" novalidate>
+        <div class="field-group">
+          <label for="event-scope">Time range</label>
+          <select id="event-scope" [value]="scope()" (change)="onScopeChange($any($event.target).value)"
+                  aria-describedby="scope-hint">
+            <option value="upcoming">Upcoming events</option>
+            <option value="past">Past events</option>
+            <option value="all">All published events</option>
+          </select>
+          <p class="field-hint" id="scope-hint">Switch between upcoming and past events. Suspended events are never listed.</p>
+        </div>
+
+        <fieldset class="field-group date-fieldset">
+          <legend>Event date</legend>
+          <div class="date-selects">
+            <div class="date-select date-select-day">
+              <label for="event-date-day">Day</label>
+              <select id="event-date-day" [value]="day()" (change)="onDateChange('day', $any($event.target).value)"
+                      [attr.aria-invalid]="dateError() ? 'true' : null" aria-describedby="date-hint">
+                <option value="">Day</option>
+                @for (d of dayOptions(); track d) {
+                  <option [value]="d < 10 ? '0' + d : d">{{ d }}</option>
+                }
+              </select>
+            </div>
+            <div class="date-select date-select-month">
+              <label for="event-date-month">Month</label>
+              <select id="event-date-month" [value]="month()" (change)="onDateChange('month', $any($event.target).value)"
+                      [attr.aria-invalid]="dateError() ? 'true' : null" aria-describedby="date-hint">
+                <option value="">Month</option>
+                @for (m of months; track m; let index = $index) {
+                  <option [value]="(index + 1) < 10 ? '0' + (index + 1) : (index + 1)">{{ m }}</option>
+                }
+              </select>
+            </div>
+            <div class="date-select date-select-year">
+              <label for="event-date-year">Year</label>
+              <select id="event-date-year" [value]="year()" (change)="onDateChange('year', $any($event.target).value)"
+                      [attr.aria-invalid]="dateError() ? 'true' : null" aria-describedby="date-hint">
+                <option value="">Year</option>
+                @for (y of yearOptions(); track y) {
+                  <option [value]="y">{{ y }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          @if (dateError()) {
+            <p class="field-error" role="alert">{{ dateError() }}</p>
+          }
+          <p class="field-hint" id="date-hint">Choose a day, month and year. Leave all three blank to search any date in the selected time range.</p>
+        </fieldset>
+
+        <div class="field-group">
+          <label for="event-location">Location</label>
+          <select id="event-location" [value]="location()" (change)="onLocationChange($any($event.target).value)">
+            <option value="">Anywhere in Sydney</option>
+            @for (option of locations(); track option.suburb) {
+              <option [value]="option.suburb">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <fieldset class="field-group category-fieldset">
+          <legend>Event category</legend>
+          <div class="category-options">
+            @if (categories().length === 0) {
+              <p class="form-loading">Loading categories&hellip;</p>
+            } @else {
+              @for (category of categories(); track category.id) {
+                <label class="check-option">
+                  <input type="checkbox" name="category" [value]="category.slug"
+                         [checked]="isSelected(category.slug)"
+                         (change)="toggleCategory(category.slug, $any($event.target).checked)">
+                  <span>{{ category.name }}</span>
+                </label>
+              }
+            }
+          </div>
+        </fieldset>
+
+        <div class="field-group">
+          <label for="event-sort">Sort by</label>
+          <select id="event-sort" [value]="sort()" (change)="onSortChange($any($event.target).value)">
+            <option value="date_asc">Date: soonest first</option>
+            <option value="raised_desc">Closest to goal</option>
+            <option value="goal_desc">Largest fundraising target</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button class="button button-primary button-full" type="submit">Show matching events</button>
+          <button class="button button-quiet button-full" type="button" (click)="clearAll()">Clear filters</button>
+        </div>
+      </form>
+    </aside>
+
+    <div class="results-panel">
+      <div class="results-heading">
+        <div>
+          <p class="kicker">Matched events</p>
+          <h2>{{ resultsTitle() }}</h2>
+        </div>
+        <p class="result-count" aria-live="polite">
+          @if (loading()) { Finding events&hellip; }
+          @else if (pagination()) {
+            {{ pagination()!.total }} event{{ pagination()!.total === 1 ? '' : 's' }} &middot; page {{ pagination()!.page }} of {{ pagination()!.totalPages }}
+          } @else { No results }
+        </p>
+      </div>
+
+      @if (error()) {
+        <div class="inline-error" role="alert">
+          <p>{{ error() }}</p>
+          <button class="button button-dark" type="button" (click)="runSearch(1, false)">Try again</button>
+        </div>
+      }
+
+      @if (activeFilters().length) {
+        <div class="active-filters" aria-label="Active filters">
+          <span class="active-filters-label">Active filters</span>
+          @for (chip of activeFilters(); track chip.type + chip.value) {
+            <button class="filter-chip" type="button" (click)="removeFilter(chip.type, chip.value)">
+              {{ chip.label }} <span aria-hidden="true">&times;</span>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="search-results" aria-live="polite" [attr.aria-busy]="loading()">
+        @if (loading()) {
+          <article class="event-card event-card-skeleton"></article>
+          <article class="event-card event-card-skeleton"></article>
+        } @else {
+          @for (event of results(); track event.id) {
+            <app-event-card [event]="event"></app-event-card>
+          }
+        }
+      </div>
+
+      @if (!loading() && searched() && !error() && results().length === 0) {
+        <div class="empty-state">
+          <div class="empty-art" aria-hidden="true"><span></span><span></span><span></span></div>
+          <h3>No events match those filters.</h3>
+          <p>Try a broader date, another suburb or fewer categories. New events are added regularly.</p>
+          <button class="button button-dark" type="button" (click)="resetFromEmpty()">Clear all filters</button>
+        </div>
+      }
+
+      @if (!loading() && pagination() && pagination()!.totalPages > 1) {
+        <nav class="pagination" aria-label="Search result pages">
+          <button class="button button-quiet" type="button" [disabled]="!hasPrevious()" (click)="previousPage()">
+            <span aria-hidden="true">&larr;</span> Previous
+          </button>
+          <ul class="pagination-list">
+            @for (page of pageNumbers(); track page) {
+              <li>
+                <button class="pagination-link" type="button"
+                        [class.is-current]="page === pagination()!.page"
+                        [attr.aria-current]="page === pagination()!.page ? 'page' : null"
+                        (click)="runSearch(page)">{{ page }}</button>
+              </li>
+            }
+          </ul>
+          <button class="button button-quiet" type="button" [disabled]="!hasNext()" (click)="nextPage()">
+            Next <span aria-hidden="true">&rarr;</span>
+          </button>
+        </nav>
+      }
+    </div>
+  </div>
+</section>

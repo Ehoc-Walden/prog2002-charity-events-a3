@@ -1,0 +1,625 @@
+<!--
+  Create / edit event form.
+
+  One template serves both routes. Every control writes straight back into the
+  component's form signal through `setField`, and every message under a control
+  comes from `validateEventForm`, which mirrors the Express validation layer
+  field for field. The form uses `novalidate` on purpose: the browser's own
+  bubble would hide the inline messages this page is built around.
+-->
+<section class="shell">
+  <div class="console-head">
+    <div>
+      <p class="eyebrow">{{ isEdit() ? 'Edit event' : 'New event' }}</p>
+      <h1>{{ heading() }}</h1>
+      <p>{{ lede() }}</p>
+    </div>
+    <div class="button-row">
+      <a class="button button-quiet" routerLink="/">Back to dashboard</a>
+      @if (isEdit()) {
+        <a class="button button-quiet" [href]="publicSiteUrl + 'events/' + eventId()">View on the public site</a>
+      }
+    </div>
+  </div>
+
+  @if (notice(); as message) {
+    <div
+      class="notice"
+      [class.notice-success]="message.tone === 'success'"
+      [class.notice-warn]="message.tone === 'warn'"
+      [class.notice-error]="message.tone === 'error'"
+      role="status">
+      <p><span class="notice-title">{{ message.title }}.</span> {{ message.message }}</p>
+      <button class="text-button" type="button" (click)="notice.set(null)">Dismiss</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-line"><span class="spinner" aria-hidden="true"></span> Loading the event&hellip;</div>
+  } @else if (error(); as message) {
+    <div class="inline-error" role="alert">
+      <p>
+        {{ message }}
+        @if (isEdit()) {
+          <a class="text-link" routerLink="/">Return to the dashboard</a>
+        }
+      </p>
+    </div>
+  } @else {
+    <form (submit)="submit($event)" novalidate>
+      <!-- 1. Who is running it, and where ---------------------------------- -->
+      <fieldset class="fieldset">
+        <legend>Organiser, category and venue</legend>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="organisationId">Organisation</label>
+            <select
+              id="organisationId"
+              [value]="form().organisationId"
+              (change)="setField('organisationId', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['organisationId'] ? 'true' : null">
+              <option value="">Choose an organisation</option>
+              @for (organisation of organisations(); track organisation.id) {
+                <option [value]="organisation.id">{{ organisation.name }}</option>
+              }
+            </select>
+            @if (errors()['organisationId']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="categoryId">Category</label>
+            <select
+              id="categoryId"
+              [value]="form().categoryId"
+              (change)="setField('categoryId', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['categoryId'] ? 'true' : null">
+              <option value="">Choose a category</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">
+                  {{ category.name }}{{ category.isActive === false ? ' (retired)' : '' }}
+                </option>
+              }
+            </select>
+            @if (errors()['categoryId']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="venueId">Venue</label>
+            <select
+              id="venueId"
+              [value]="form().venueId"
+              (change)="setField('venueId', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['venueId'] ? 'true' : null">
+              <option value="">Choose a venue</option>
+              @for (venue of venues(); track venue.id) {
+                <option [value]="venue.id">{{ venue.name }} - {{ venue.suburb }}</option>
+              }
+            </select>
+            @if (errors()['venueId']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">The venue supplies the latitude and longitude the weather panel uses.</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 2. The event itself ---------------------------------------------- -->
+      <fieldset class="fieldset">
+        <legend>The event</legend>
+        <div class="form-grid">
+          <div class="form-field form-field-wide">
+            <label for="title">Title</label>
+            <input
+              id="title"
+              type="text"
+              maxlength="180"
+              placeholder="Twilight Harbour Walk"
+              [value]="form().title"
+              (input)="setField('title', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['title'] ? 'true' : null">
+            @if (errors()['title']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">Up to {{ limits.title }} characters.</p>
+            }
+          </div>
+
+          <div class="form-field form-field-wide">
+            <label for="slug">Slug</label>
+            <div class="button-row">
+              <input
+                id="slug"
+                type="text"
+                maxlength="200"
+                placeholder="twilight-harbour-walk"
+                [value]="form().slug"
+                (input)="setField('slug', $any($event.target).value)"
+                [attr.aria-invalid]="errors()['slug'] ? 'true' : null">
+              <button class="button button-quiet" type="button" (click)="suggestSlug()">Build from the title</button>
+            </div>
+            @if (errors()['slug']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">Lower-case letters, numbers and single hyphens; used in the public URL.</p>
+            }
+          </div>
+
+          <div class="form-field form-field-wide">
+            <label for="summary">Summary</label>
+            <textarea
+              id="summary"
+              maxlength="380"
+              [value]="form().summary"
+              (input)="setField('summary', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['summary'] ? 'true' : null"></textarea>
+            @if (errors()['summary']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">{{ form().summary.length }} of {{ limits.summary }} characters. Shown on every event card.</p>
+            }
+          </div>
+
+          <div class="form-field form-field-wide">
+            <label for="purpose">Purpose</label>
+            <textarea
+              id="purpose"
+              maxlength="260"
+              [value]="form().purpose"
+              (input)="setField('purpose', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['purpose'] ? 'true' : null"></textarea>
+            @if (errors()['purpose']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">One sentence on what the money does. Up to {{ limits.purpose }} characters.</p>
+            }
+          </div>
+
+          <div class="form-field form-field-wide">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              maxlength="4000"
+              [value]="form().description"
+              (input)="setField('description', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['description'] ? 'true' : null"></textarea>
+            @if (errors()['description']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">{{ form().description.length }} of {{ limits.description }} characters. The long story on the event page.</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 3. When ------------------------------------------------------- -->
+      <fieldset class="fieldset">
+        <legend>Date, time and time zone</legend>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="startDateTime">Starts</label>
+            <input
+              id="startDateTime"
+              type="datetime-local"
+              [value]="form().startDateTime"
+              (input)="setField('startDateTime', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['startDateTime'] ? 'true' : null">
+            @if (errors()['startDateTime']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="endDateTime">Ends</label>
+            <input
+              id="endDateTime"
+              type="datetime-local"
+              [value]="form().endDateTime"
+              (input)="setField('endDateTime', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['endDateTime'] ? 'true' : null">
+            @if (errors()['endDateTime']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">The end must be later than the start.</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="timezone">Time zone</label>
+            <select id="timezone" [value]="form().timezone" (change)="setField('timezone', $any($event.target).value)">
+              @for (zone of timeZones; track zone) {
+                <option [value]="zone">{{ zone }}</option>
+              }
+            </select>
+            @if (errors()['timezone']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 4. Tickets and fundraising ------------------------------------- -->
+      <fieldset class="fieldset">
+        <legend>Tickets and fundraising</legend>
+        <div class="form-grid">
+          <div class="form-field check-field form-field-wide">
+            <input
+              id="isFree"
+              type="checkbox"
+              [checked]="form().isFree"
+              (change)="setField('isFree', $any($event.target).checked)">
+            <label for="isFree">This is a free event</label>
+          </div>
+
+          @if (!form().isFree) {
+            <div class="form-field">
+              <label for="ticketPrice">Ticket price</label>
+              <div class="money-field">
+                <span class="money-mark" aria-hidden="true">$</span>
+                <input
+                  id="ticketPrice"
+                  type="number"
+                  min="0"
+                  max="100000"
+                  step="0.01"
+                  [value]="form().ticketPrice"
+                  (input)="setField('ticketPrice', $any($event.target).value)"
+                  [attr.aria-invalid]="errors()['ticketPrice'] ? 'true' : null">
+              </div>
+              @if (errors()['ticketPrice']; as message) {
+                <p class="field-error">{{ message }}</p>
+              }
+            </div>
+          }
+
+          <div class="form-field">
+            <label for="currency">Currency</label>
+            <select id="currency" [value]="form().currency" (change)="setField('currency', $any($event.target).value)">
+              @for (code of currencies; track code) {
+                <option [value]="code">{{ code }}</option>
+              }
+            </select>
+            @if (errors()['currency']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="goalAmount">Fundraising goal</label>
+            <div class="money-field">
+              <span class="money-mark" aria-hidden="true">$</span>
+              <input
+                id="goalAmount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                [value]="form().goalAmount"
+                (input)="setField('goalAmount', $any($event.target).value)"
+                [attr.aria-invalid]="errors()['goalAmount'] ? 'true' : null">
+            </div>
+            @if (errors()['goalAmount']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="raisedAmount">Raised so far</label>
+            <div class="money-field">
+              <span class="money-mark" aria-hidden="true">$</span>
+              <input
+                id="raisedAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                [value]="form().raisedAmount"
+                (input)="setField('raisedAmount', $any($event.target).value)"
+                [attr.aria-invalid]="errors()['raisedAmount'] ? 'true' : null">
+            </div>
+            @if (errors()['raisedAmount']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="capacity">Capacity</label>
+            <input
+              id="capacity"
+              type="number"
+              min="1"
+              max="1000000"
+              step="1"
+              placeholder="Leave blank for no limit"
+              [value]="form().capacity"
+              (input)="setField('capacity', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['capacity'] ? 'true' : null">
+            @if (errors()['capacity']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">A blank capacity is stored as NULL, which the API reads as "no limit".</p>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 5. Publishing -------------------------------------------------- -->
+      <fieldset class="fieldset">
+        <legend>Publishing</legend>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="status">Status</label>
+            <select
+              id="status"
+              [value]="form().status"
+              (change)="setField('status', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['status'] ? 'true' : null">
+              @for (value of statuses; track value) {
+                <option [value]="value">{{ value }}</option>
+              }
+            </select>
+            @if (errors()['status']; as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint">
+                Only <strong>published</strong> events appear on the public site. Publishing records
+                the start date as the publish time.
+              </p>
+            }
+          </div>
+
+          <div class="form-field check-field">
+            <input
+              id="isFeatured"
+              type="checkbox"
+              [checked]="form().isFeatured"
+              (change)="setField('isFeatured', $any($event.target).checked)">
+            <label for="isFeatured">Feature this event</label>
+          </div>
+
+          <div class="form-field">
+            <label for="heroImageKey">Cover image</label>
+            <select
+              id="heroImageKey"
+              [value]="form().heroImageKey"
+              (change)="setField('heroImageKey', $any($event.target).value)"
+              [attr.aria-invalid]="errors()['heroImageKey'] ? 'true' : null">
+              @for (cover of coverImages; track cover.key) {
+                <option [value]="cover.key">{{ cover.label }}</option>
+              }
+            </select>
+            @if (errors()['heroImageKey']; as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="form-field">
+            <span class="fieldset-label">Preview</span>
+            <img class="cover-preview" [src]="coverPreview()" alt="" width="320" height="180">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 6. Highlights -------------------------------------------------- -->
+      <fieldset class="fieldset">
+        <legend>What to know (optional)</legend>
+        <p class="field-hint">
+          These become the "what to know" bullets on the public event page. Each one needs a
+          heading of up to {{ limits.highlightTitle }} characters and a detail of up to
+          {{ limits.highlightDetail }}.
+        </p>
+
+        @for (highlight of form().highlights; track $index) {
+          <div class="highlight-row">
+            <div class="form-field">
+              <label [attr.for]="'highlight-' + $index + '-title'">Heading {{ $index + 1 }}</label>
+              <input
+                [id]="'highlight-' + $index + '-title'"
+                type="text"
+                maxlength="120"
+                [value]="highlight.title"
+                (input)="setHighlight($index, 'title', $any($event.target).value)"
+                [attr.aria-invalid]="highlightError($index, 'title') ? 'true' : null">
+              @if (highlightError($index, 'title'); as message) {
+                <p class="field-error">{{ message }}</p>
+              }
+            </div>
+            <div class="form-field">
+              <label [attr.for]="'highlight-' + $index + '-detail'">Detail</label>
+              <textarea
+                [id]="'highlight-' + $index + '-detail'"
+                maxlength="300"
+                [value]="highlight.detail"
+                (input)="setHighlight($index, 'detail', $any($event.target).value)"
+                [attr.aria-invalid]="highlightError($index, 'detail') ? 'true' : null"></textarea>
+              @if (highlightError($index, 'detail'); as message) {
+                <p class="field-error">{{ message }}</p>
+              }
+            </div>
+            <div class="button-row">
+              <button class="button button-danger" type="button" (click)="removeHighlight($index)">Remove</button>
+            </div>
+          </div>
+        }
+
+        <div class="button-row">
+          <button class="button button-quiet" type="button" (click)="addHighlight()">Add a bullet</button>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button class="button button-primary" type="submit" [disabled]="saving()">
+          {{ isEdit() ? 'Save changes' : 'Create event' }}
+        </button>
+        <button class="button button-quiet" type="button" (click)="resetForm()" [disabled]="saving()">
+          {{ isEdit() ? 'Reload the stored event' : 'Clear the form' }}
+        </button>
+        <a class="button button-quiet" routerLink="/">Cancel</a>
+        <p class="field-hint">
+          The form is checked in the browser first; the same rules are checked again inside Express,
+          because a client can always be bypassed.
+        </p>
+      </div>
+    </form>
+
+    <!-- 7. Weather (external Open-Meteo API) ------------------------------ -->
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Weather for this event</h2>
+          <p>
+            Five-day forecast from the Open-Meteo API, reached through
+            <code>GET /api/weather</code> so the third-party URL never appears in the page.
+          </p>
+        </div>
+        <button class="button button-quiet" type="button" (click)="loadForecast()" [disabled]="forecastLoading()">
+          Refresh forecast
+        </button>
+      </div>
+
+      <div class="weather-panel">
+        <h3>
+          @if (forecast()?.venue?.name || forecastVenue()?.name) {
+            {{ forecast()?.venue?.name || forecastVenue()?.name }}
+          } @else {
+            No venue selected yet
+          }
+        </h3>
+
+        @if (forecastLoading()) {
+          <div class="loading-line"><span class="spinner" aria-hidden="true"></span> Asking Open-Meteo&hellip;</div>
+        } @else if (forecastError(); as message) {
+          <p>{{ message }}</p>
+        } @else if (forecast(); as data) {
+          <p>
+            {{ data.unit === 'celsius' ? 'Temperatures in Celsius' : data.unit }},
+            generated {{ data.generatedAt }}.
+          </p>
+          <ul class="weather-strip">
+            @for (day of data.days; track day.date) {
+              <li class="weather-day">
+                <span class="weather-day-name">{{ day.date }}</span>
+                <span class="weather-icon" aria-hidden="true">{{ day.icon }}</span>
+                <strong>{{ day.label }}</strong>
+                <span class="weather-temp">{{ day.temperatureMin }}&deg; / {{ day.temperatureMax }}&deg;</span>
+              </li>
+            }
+          </ul>
+          <span class="weather-source">Source: {{ data.source }}</span>
+        } @else {
+          <p>
+            Choose a venue above and the forecast for its coordinates is requested automatically.
+            In edit mode the coordinates are read back out of MySQL for this event.
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- 8. Registrations (edit mode only) -------------------------------- -->
+    @if (isEdit()) {
+      <div class="panel registrations-block">
+        <div class="panel-head">
+          <div>
+            <h2>Tickets sold for this event</h2>
+            <p>
+              {{ registrations().length }} registration(s), {{ ticketsSold() }} ticket(s), read through
+              <code>GET /api/events/{{ eventId() }}/registrations</code>.
+            </p>
+          </div>
+          <a class="button button-quiet" routerLink="/">Back to dashboard</a>
+        </div>
+
+        @if (registrations().length === 0) {
+          <p class="table-sub">
+            Nobody has registered yet. An event with no registrations can still be deleted from the
+            dashboard; once a ticket is sold the API protects the record with a 409 response.
+          </p>
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <caption class="visually-hidden">Registrations for this event</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Reference</th>
+                  <th scope="col">Attendee</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col">Tickets</th>
+                  <th scope="col">Registered</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (registration of registrations(); track registration.id) {
+                  <tr>
+                    <td class="cell-narrow"><span class="reference-code">{{ registration.referenceCode }}</span></td>
+                    <td>
+                      {{ registration.fullName }}
+                      @if (registration.notes) {
+                        <span class="table-sub">{{ registration.notes }}</span>
+                      }
+                    </td>
+                    <td>
+                      {{ registration.email }}
+                      <span class="table-sub">{{ registration.phone || 'No phone supplied' }}</span>
+                    </td>
+                    <td class="cell-narrow">{{ registration.ticketQuantity }}</td>
+                    <td class="cell-narrow">{{ registrationDate(registration.registrationDate) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- 9. A read-only reminder of what will be sent --------------------- -->
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>What the page will send</h2>
+          <p>Live summary of the values {{ isEdit() ? 'PUT' : 'POST' }} will carry to the API.</p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <span class="fieldset-label">When</span>
+          <p class="preview-value">
+            {{ form().startDateTime ? dateLabel(form().startDateTime) : 'Not set yet' }}
+            @if (form().startDateTime) {
+              <span class="table-sub">
+                {{ timeLabel(form().startDateTime) }} - {{ timeLabel(form().endDateTime) }}
+              </span>
+            }
+          </p>
+        </div>
+        <div class="form-field">
+          <span class="fieldset-label">Ticket</span>
+          <p class="preview-value">
+            {{ form().isFree ? 'Free entry' : money(form().ticketPrice) }}
+            <span class="table-sub">{{ form().currency }}</span>
+          </p>
+        </div>
+        <div class="form-field">
+          <span class="fieldset-label">Fundraising</span>
+          <p class="preview-value">
+            {{ money(form().raisedAmount) }} of {{ money(form().goalAmount) }}
+          </p>
+        </div>
+        <div class="form-field">
+          <span class="fieldset-label">Capacity</span>
+          <p class="preview-value">{{ form().capacity || 'No limit' }}</p>
+        </div>
+        <div class="form-field">
+          <span class="fieldset-label">Status</span>
+          <p class="preview-value"><span class="status-chip status-{{ form().status }}">{{ form().status }}</span></p>
+        </div>
+        <div class="form-field">
+          <span class="fieldset-label">Highlights</span>
+          <p class="preview-value">{{ form().highlights.length }} bullet(s)</p>
+        </div>
+      </div>
+    </div>
+  }
+</section>

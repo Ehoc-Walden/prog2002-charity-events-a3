@@ -1,0 +1,268 @@
+<!--
+  Category management screen.
+
+  The left column lists every category, active and retired, exactly as it came
+  back from `GET /api/categories?includeInactive=1`. The right column holds one
+  form that is reused for both "add" and "edit": saving re-reads the list, so the
+  screen never shows a value the database does not hold.
+-->
+<section class="shell">
+  <div class="console-head">
+    <div>
+      <p class="eyebrow">Categories</p>
+      <h1>Group the events, <em>not the clutter.</em></h1>
+      <p>
+        Categories drive the filter on the public search page, so every change here is
+        visible to visitors immediately. A category that events still point at cannot be
+        deleted - the API refuses and explains why.
+      </p>
+    </div>
+    <div class="button-row">
+      <a class="button button-quiet" routerLink="/">Back to dashboard</a>
+      <button class="button button-quiet" type="button" (click)="load()" [disabled]="loading() || saving()">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (notice(); as message) {
+    <div
+      class="notice"
+      [class.notice-success]="message.tone === 'success'"
+      [class.notice-warn]="message.tone === 'warn'"
+      [class.notice-error]="message.tone === 'error'"
+      role="status">
+      <p><span class="notice-title">{{ message.title }}.</span> {{ message.message }}</p>
+      <button class="text-button" type="button" (click)="notice.set(null)">Dismiss</button>
+    </div>
+  }
+
+  @if (pendingDelete(); as target) {
+    <div class="notice notice-warn" role="alert">
+      <div>
+        <p><span class="notice-title">Delete &ldquo;{{ target.name }}&rdquo;?</span> This cannot be undone.</p>
+        <p>
+          The API only allows the delete when no event references this category. If
+          {{ target.eventCount }} event(s) still use it, the request is blocked with a 409
+          response and nothing is removed.
+        </p>
+      </div>
+      <div class="button-row">
+        <button class="button button-danger" type="button" (click)="confirmRemove()" [disabled]="saving()">
+          Yes, delete it
+        </button>
+        <button class="button button-quiet" type="button" (click)="cancelRemove()">Keep it</button>
+      </div>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-line"><span class="spinner" aria-hidden="true"></span> Loading categories&hellip;</div>
+  } @else if (error(); as message) {
+    <div class="inline-error" role="alert">
+      <p>{{ message }} <button class="text-link" type="button" (click)="load()">Try again</button></p>
+    </div>
+  } @else {
+    <div class="category-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>All categories</h2>
+            <p>
+              {{ categories().length }} categor{{ categories().length === 1 ? 'y' : 'ies' }} in total, including
+              {{ inactiveCount() }} switched off.
+            </p>
+          </div>
+          <button class="button button-primary" type="button" (click)="startCreate()">Add a category</button>
+        </div>
+
+        @if (categories().length === 0) {
+          <div class="console-empty">
+            <h3>No categories yet</h3>
+            <p>Add the first category on the right. Events cannot be created until at least one exists.</p>
+          </div>
+        } @else {
+          <ul class="category-list">
+            @for (category of categories(); track category.id) {
+              <li class="category-item" [class.is-inactive]="category.isActive === false">
+                <span class="category-swatch" [style.background]="category.accentColour" aria-hidden="true"></span>
+                <div>
+                  <h3>
+                    {{ category.name }}
+                    @if (category.isActive === false) {
+                      <span class="status-chip status-draft">Switched off</span>
+                    } @else {
+                      <span class="status-chip status-published">Active</span>
+                    }
+                  </h3>
+                  <p>{{ category.description }}</p>
+                  <p class="category-meta">
+                    /{{ category.slug }} &middot; icon: {{ category.iconKey }} &middot; {{ category.accentColour }}
+                    &middot; {{ category.eventCount ?? 0 }} event(s)
+                  </p>
+                </div>
+                <div class="row-actions">
+                  <button class="button button-quiet" type="button" (click)="startEdit(category)">
+                    {{ isEditing(category) ? 'Editing' : 'Edit' }}
+                  </button>
+                  <button class="button button-danger" type="button" (click)="askRemove(category)" [disabled]="saving()">
+                    Delete
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <form class="panel" (submit)="submit($event)" novalidate>
+        <div class="panel-head">
+          <div>
+            <h2>{{ formTitle() }}</h2>
+            <p>
+              @if (editingId() === null) {
+                Create a new category for the public search filter.
+              } @else {
+                Change the values and save, or cancel to go back to adding a new one.
+              }
+            </p>
+          </div>
+          @if (editingId() !== null) {
+            <span class="category-meta">#{{ editingId() }}</span>
+          }
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="category-name">Name</label>
+            <input
+              id="category-name"
+              name="name"
+              type="text"
+              autocomplete="off"
+              [attr.maxlength]="limits.name"
+              [attr.aria-invalid]="errors().name ? 'true' : null"
+              [attr.aria-describedby]="errors().name ? 'category-name-error' : 'category-name-hint'"
+              [value]="form().name"
+              (input)="setField('name', $any($event.target).value)">
+            @if (errors().name; as message) {
+              <p class="field-error" id="category-name-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint" id="category-name-hint">
+                {{ form().name.length }} of {{ limits.name }} characters.
+              </p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="category-slug">Slug</label>
+            <input
+              id="category-slug"
+              name="slug"
+              type="text"
+              autocomplete="off"
+              [attr.maxlength]="limits.slug"
+              [attr.aria-invalid]="errors().slug ? 'true' : null"
+              [attr.aria-describedby]="errors().slug ? 'category-slug-error' : 'category-slug-hint'"
+              [value]="form().slug"
+              (input)="setField('slug', $any($event.target).value)">
+            @if (errors().slug; as message) {
+              <p class="field-error" id="category-slug-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint" id="category-slug-hint">
+                Used by <code>/search?category=</code>.
+                <button class="text-button" type="button" (click)="suggestSlug()">Build it from the name</button>
+              </p>
+            }
+          </div>
+
+          <div class="form-field form-field-wide">
+            <label for="category-description">Description</label>
+            <textarea
+              id="category-description"
+              name="description"
+              rows="3"
+              [attr.maxlength]="limits.description"
+              [attr.aria-invalid]="errors().description ? 'true' : null"
+              [attr.aria-describedby]="errors().description ? 'category-description-error' : 'category-description-hint'"
+              [value]="form().description"
+              (input)="setField('description', $any($event.target).value)"></textarea>
+            @if (errors().description; as message) {
+              <p class="field-error" id="category-description-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint" id="category-description-hint">
+                Shown on the category cards and in the search filters.
+                {{ form().description.length }} of {{ limits.description }} characters.
+              </p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="category-accentColour">Accent colour</label>
+            <input
+              id="category-accentColour"
+              name="accentColour"
+              type="color"
+              aria-describedby="category-colour-hint"
+              [value]="form().accentColour"
+              (input)="setField('accentColour', $any($event.target).value)">
+            @if (errors().accentColour; as message) {
+              <p class="field-error" id="category-colour-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint" id="category-colour-hint">
+                Saved as {{ form().accentColour.toUpperCase() }} and used for the swatch.
+              </p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="category-iconKey">Icon key</label>
+            <input
+              id="category-iconKey"
+              name="iconKey"
+              type="text"
+              autocomplete="off"
+              list="category-icon-keys"
+              [attr.maxlength]="limits.iconKey"
+              [attr.aria-invalid]="errors().iconKey ? 'true' : null"
+              [attr.aria-describedby]="errors().iconKey ? 'category-iconKey-error' : 'category-icon-hint'"
+              [value]="form().iconKey"
+              (input)="setField('iconKey', $any($event.target).value)">
+            <datalist id="category-icon-keys">
+              @for (key of iconKeys; track key) {
+                <option [value]="key"></option>
+              }
+            </datalist>
+            @if (errors().iconKey; as message) {
+              <p class="field-error" id="category-iconKey-error">{{ message }}</p>
+            } @else {
+              <p class="field-hint" id="category-icon-hint">A short key such as <code>community</code>.</p>
+            }
+          </div>
+
+          <div class="form-field check-field form-field-wide">
+            <input
+              id="category-isActive"
+              name="isActive"
+              type="checkbox"
+              [checked]="form().isActive"
+              (change)="setField('isActive', $any($event.target).checked)">
+            <label for="category-isActive">Active - show this category on the public website</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="button button-primary" type="submit" [disabled]="saving()">
+            {{ editingId() === null ? 'Create category' : 'Save changes' }}
+          </button>
+          <button class="button button-quiet" type="button" (click)="cancelEdit()" [disabled]="saving()">
+            {{ editingId() === null ? 'Clear form' : 'Cancel edit' }}
+          </button>
+          @if (submitted() && errors().name) {
+            <p class="field-error" role="alert">Please fix the highlighted fields before saving.</p>
+          }
+        </div>
+      </form>
+    </div>
+  }
+</section>

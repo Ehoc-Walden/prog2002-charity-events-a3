@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Spring Pantry</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#3A2B20"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C86B3C" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#80B97A" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="128" y="212" width="400" height="432" rx="24" fill="#C86B3C"/>
+    <rect x="570" y="212" width="500" height="432" rx="24" fill="#80B97A"/>
+    <path d="M128 356h400M128 500h400M261 212v432M395 212v432" stroke="#F2D95C" stroke-width="22"/>
+    <path d="M651 309h339M651 432h238M651 555h284" stroke="#3A2B20" stroke-width="25"/>
+    <path d="M467 194c36-104 110-135 223-92" stroke="#F2D95C" stroke-width="24"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#F2D95C" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#3A2B20"/>
+    <path d="M28 51V31" stroke="#3A2B20" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#F2D95C" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

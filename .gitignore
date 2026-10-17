@@ -1,0 +1,11 @@
+﻿**/node_modules/
+**/.env
+*.log
+api/.npm-cache/
+report_a3_render_check/
+/api-smoke-test.js
+/browser-*.js
+/browser-*.json
+/test-spa-server.js
+**/dist-browser/
+**/dist-ngc/

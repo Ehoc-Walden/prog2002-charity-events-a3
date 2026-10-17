@@ -1,0 +1,30 @@
+{
+  "name": "charity-events-api",
+  "version": "3.0.0",
+  "private": true,
+  "description": "PROG2002 Assessment 3 RESTful API: full CRUD for charity events, registrations and an Open-Meteo weather proxy. Serves the Angular client-side and admin-side websites.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "PROG2002",
+    "express",
+    "mysql",
+    "rest-api"
+  ],
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "mysql2": "^3.12.0"
+  }
+}
+
+

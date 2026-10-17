@@ -1,0 +1,16 @@
+<nav class="primary-nav" id="primary-nav" aria-label="Primary navigation" [class.is-open]="open">
+  <a
+    routerLink="/"
+    routerLinkActive="is-active"
+    #home="routerLinkActive"
+    [attr.aria-current]="home.isActive ? 'page' : null"
+    (click)="close()">Home</a>
+  <a
+    routerLink="/search"
+    routerLinkActive="is-active"
+    #search="routerLinkActive"
+    [attr.aria-current]="search.isActive ? 'page' : null"
+    (click)="close()">Find an event</a>
+  <a routerLink="/" fragment="impact" (click)="close()">Our impact</a>
+  <a routerLink="/" fragment="how-it-works" (click)="close()">How it works</a>
+</nav>

@@ -1,0 +1,17 @@
+<!--
+  Root shell of the client website.
+
+  The Header (with the shared Nav) and the Footer are declared here exactly
+  once. Every routed page is projected into the router-outlet below, so the
+  common segments are literally shared by all pages - this is the fix for the
+  Assessment 2 feedback about duplicating the header, nav and footer.
+-->
+<app-site-header [solid]="solidHeader()"></app-site-header>
+
+<div class="site-alert" role="status" aria-live="polite" hidden></div>
+
+<main id="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<app-site-footer></app-site-footer>

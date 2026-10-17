@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Beats For Belonging</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#17282B"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E84A7F" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#17B7A5" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M90 386c96-242 183 201 294-2s171 235 278 13 192 198 344-72" stroke="#E84A7F" stroke-width="48"/>
+    <path d="M98 559c82-183 168 141 268-8s173 181 273 5 193 145 352-64" stroke="#17B7A5" stroke-width="30" opacity=".92"/>
+    <circle cx="900" cy="226" r="103" fill="#17B7A5"/>
+    <path d="M870 168v116l94-58-94-58Z" fill="#17282B"/>
+    <path d="M137 163h230M137 204h144" stroke="#F2D95C" stroke-width="15"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#F2D95C" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#17282B"/>
+    <path d="M28 51V31" stroke="#17282B" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#F2D95C" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

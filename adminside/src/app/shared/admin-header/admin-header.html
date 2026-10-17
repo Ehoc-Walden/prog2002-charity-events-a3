@@ -1,0 +1,28 @@
+<!--
+  Shared header of the staff console.
+
+  The console bar identifies the application (so staff can never confuse it with
+  the public website) and links back to the public site. The brand lock-up and
+  the navigation are shared by every route; the header is declared once in
+  `app.html` and never repeated inside a page.
+-->
+<div class="console-bar">
+  <div class="shell console-bar-inner">
+    <p><strong>{{ consoleName }}</strong> {{ siteName }} - internal event administration</p>
+    <p>Public website: <a [href]="publicSiteUrl">{{ publicSiteUrl }}</a></p>
+  </div>
+</div>
+
+<header class="site-header site-header-solid" [class.is-scrolled]="scrolled()">
+  <div class="shell header-inner">
+    <a class="brand" routerLink="/" aria-label="Common Ground Collective staff console home">
+      <img src="assets/common-ground-mark.svg" alt="" width="44" height="44">
+      <span class="brand-copy"><strong>Common Ground</strong><small>{{ consoleName }}</small></span>
+    </a>
+    <button class="nav-toggle" type="button" [attr.aria-expanded]="navOpen()" aria-controls="console-nav" (click)="toggleNav()">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"><i></i><i></i></span>
+    </button>
+    <app-admin-nav [open]="navOpen()" (followed)="closeNav()"></app-admin-nav>
+  </div>
+</header>

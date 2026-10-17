@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Twilight Harbour</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#102338"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF5A36" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#F2D95C" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-80 660C190 520 235 235 515 335s336-180 745-60" stroke="url(#fade)" stroke-width="150"/>
+    <path d="M-40 440C210 390 270 630 530 545s315-135 720-290" stroke="#F2D95C" stroke-width="16" opacity=".9"/>
+    <path d="M40 720C260 560 380 525 560 575s360 74 620-75" stroke="#17B7A5" stroke-width="18" stroke-dasharray="4 28" opacity=".9"/>
+    <circle cx="865" cy="214" r="137" fill="#F2D95C" opacity=".92"/>
+    <circle cx="865" cy="214" r="88" fill="#FF5A36"/>
+    <path d="M815 215h100M865 165v100" stroke="#102338" stroke-width="18"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#17B7A5" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#102338"/>
+    <path d="M28 51V31" stroke="#102338" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#17B7A5" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

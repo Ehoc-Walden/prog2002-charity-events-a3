@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">River Clean Up</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#173B45"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1C9DA0" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#D8E86A" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-30 368c163-119 300-119 463 0s300 119 463 0 300-119 463 0" stroke="url(#fade)" stroke-width="128"/>
+    <path d="M-20 491c163-119 300-119 463 0s300 119 463 0 300-119 463 0" stroke="#D8E86A" stroke-width="36"/>
+    <path d="M760 123c-82 18-123 65-123 141 0 72 44 124 135 124 86 0 132-50 132-122 0-76-44-124-144-143Z" fill="#EAF7F2" opacity=".92"/>
+    <path d="M746 211c19-34 56-51 105-48M770 303c-6-40 4-73 31-99" stroke="#173B45" stroke-width="13" fill="none"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#EAF7F2" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#173B45"/>
+    <path d="M28 51V31" stroke="#173B45" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#EAF7F2" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

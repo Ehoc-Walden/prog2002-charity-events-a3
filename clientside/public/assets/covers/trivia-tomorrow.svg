@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Trivia For Tomorrow</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#11382E"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2E7D68" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#F0C95A" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="#2E7D68" opacity=".93">
+      <circle cx="200" cy="242" r="86"/><circle cx="390" cy="242" r="86"/><circle cx="580" cy="242" r="86"/>
+      <circle cx="295" cy="414" r="86"/><circle cx="485" cy="414" r="86"/><circle cx="675" cy="414" r="86"/>
+      <circle cx="390" cy="586" r="86"/><circle cx="580" cy="586" r="86"/><circle cx="770" cy="586" r="86"/>
+    </g>
+    <path d="M794 144h244v430H794z" fill="#F0C95A" transform="rotate(7 916 359)"/>
+    <path d="M871 276c6-41 38-60 79-52 43 9 64 45 50 82-11 29-32 39-56 58-12 10-18 22-18 39" stroke="#11382E" stroke-width="22" fill="none"/>
+    <circle cx="921" cy="467" r="14" fill="#11382E"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#EAEFEA" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#11382E"/>
+    <path d="M28 51V31" stroke="#11382E" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#EAEFEA" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

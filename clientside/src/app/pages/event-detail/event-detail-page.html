@@ -1,0 +1,204 @@
+<!-- Event detail page body. Chrome comes from the root shell. -->
+@if (loading()) {
+  <div class="event-loading shell" aria-live="polite">
+    <div class="loading-orb" aria-hidden="true"></div>
+    <p>Opening event details&hellip;</p>
+  </div>
+} @else if (error() || !event()) {
+  <div class="event-error shell">
+    <p class="eyebrow">Event unavailable</p>
+    <h1>We could not open this event.</h1>
+    <p>{{ error() || 'Check the link and try again.' }}</p>
+    <a class="button button-dark" routerLink="/search">Return to event search</a>
+  </div>
+} @else {
+  <article>
+    <section class="event-hero">
+      <div class="shell">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a routerLink="/">Home</a><span aria-hidden="true">/</span>
+          <a routerLink="/search">Events</a><span aria-hidden="true">/</span>
+          <span>{{ event()!.title }}</span>
+        </nav>
+        <div class="event-hero-grid">
+          <div class="event-hero-copy">
+            <div class="event-meta">
+              <span class="tag tag-accent">{{ event()!.category?.name || 'Community' }}</span>
+              <span class="tag">{{ longDate() }}</span>
+              <span class="tag tag-status" [class.is-past]="event()!.isPast">{{ statusLabel() }}</span>
+            </div>
+            <h1>{{ event()!.title }}</h1>
+            <p class="event-summary">{{ event()!.summary }}</p>
+            <div class="event-quick-facts">
+              <div><span aria-hidden="true">&#8982;</span><strong>{{ event()!.venue?.name }}</strong><small>{{ event()!.venue?.suburb }}, {{ event()!.venue?.stateCode }} {{ event()!.venue?.postcode }}</small></div>
+              <div><span aria-hidden="true">&#9200;</span><strong>{{ timeRange() }}</strong><small>{{ event()!.timezone }}</small></div>
+              <div><span aria-hidden="true">&#9783;</span><strong>{{ formatNumber(event()!.registrationSummary?.ticketsSold) }}</strong><small>tickets purchased</small></div>
+            </div>
+          </div>
+          <div class="event-cover-wrap">
+            <img class="event-cover" [src]="coverPath()" [alt]="event()!.title + ' event cover'">
+            <div class="cover-caption"><span>{{ event()!.category?.name || 'Community' }}</span><span>{{ longDate() }}</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="event-detail-section section">
+      <div class="shell event-detail-grid">
+        <div class="event-story">
+          <section class="story-block">
+            <p class="eyebrow">The purpose</p>
+            <h2>{{ event()!.purpose }}</h2>
+            <p class="story-lede">{{ event()!.description }}</p>
+          </section>
+
+          @if (event()!.highlights?.length) {
+            <section class="story-block">
+              <p class="eyebrow">What to know</p>
+              <h2>Event highlights</h2>
+              <div class="highlight-grid">
+                @for (highlight of event()!.highlights; track highlight.id) {
+                  <article class="highlight-card">
+                    <h3>{{ highlight.title }}</h3>
+                    <p>{{ highlight.detail }}</p>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+
+          <!-- Assessment 3 addition: the live registration list, newest first. -->
+          <section class="story-block registrations-block">
+            <p class="eyebrow">Registration activity</p>
+            <h2>Who has registered</h2>
+            <div class="registration-summary">
+              <div><strong>{{ formatNumber(event()!.registrationSummary?.totalRegistrations) }}</strong><span>registrations</span></div>
+              <div><strong>{{ formatNumber(event()!.registrationSummary?.ticketsSold) }}</strong><span>tickets purchased</span></div>
+              <div><strong>{{ event()!.registrationSummary?.latestRegistrationDate ? event()!.registrationSummary!.latestRegistrationDate : '\u2014' }}</strong><span>latest purchase</span></div>
+            </div>
+
+            @if (event()!.registrations?.length) {
+              <div class="table-wrap">
+                <table class="data-table">
+                  <caption class="visually-hidden">Registrations for {{ event()!.title }}, sorted by the most recent purchase date</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Reference</th>
+                      <th scope="col">Attendee</th>
+                      <th scope="col">Tickets</th>
+                      <th scope="col">Purchased</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (registration of event()!.registrations; track registration.id) {
+                      <tr>
+                        <td><span class="reference-code">{{ registration.referenceCode }}</span></td>
+                        <td>
+                          <strong>{{ registration.fullName }}</strong>
+                          <small class="table-sub">{{ registration.email }}</small>
+                        </td>
+                        <td>{{ registration.ticketQuantity }}</td>
+                        <td>{{ registration.registrationDate }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="story-note">No tickets have been purchased for this event yet. Be the first to register.</p>
+            }
+          </section>
+
+          <!-- Assessment 3 addition: external Open-Meteo forecast for the venue. -->
+          <section class="story-block weather-block">
+            <p class="eyebrow">External API &middot; Open-Meteo</p>
+            <h2>Weather forecast for the venue</h2>
+            @if (forecast()) {
+              <p class="story-note">
+                {{ forecast()!.days.length }}-day forecast for {{ forecast()!.venue?.name || event()!.venue?.name }}
+                ({{ forecast()!.latitude }}, {{ forecast()!.longitude }}) in {{ forecast()!.timezone }}.
+              </p>
+              <ul class="weather-strip">
+                @for (day of forecast()!.days; track day.date) {
+                  <li class="weather-day">
+                    <span class="weather-day-name">{{ day.date }}</span>
+                    <span class="weather-icon" aria-hidden="true">{{ day.icon }}</span>
+                    <strong>{{ day.label }}</strong>
+                    <span class="weather-temp">
+                      {{ day.temperatureMax }}&deg; / {{ day.temperatureMin }}&deg;C
+                    </span>
+                  </li>
+                }
+              </ul>
+              <p class="story-note small">Source: {{ forecast()!.source }} &middot; generated {{ forecast()!.generatedAt }}</p>
+            } @else if (weatherError()) {
+              <p class="story-note">{{ weatherError() }}</p>
+            } @else {
+              <p class="story-note">Loading the forecast&hellip;</p>
+            }
+          </section>
+
+          <section class="story-block organiser-block">
+            <div>
+              <p class="eyebrow">Organised by</p>
+              <h2>{{ event()!.organisation?.name }}</h2>
+              <p>{{ event()!.organisation?.mission }}</p>
+            </div>
+            <div class="organiser-monogram" aria-hidden="true">{{ organiserInitials() }}</div>
+          </section>
+        </div>
+
+        <aside class="registration-column">
+          <div class="registration-card">
+            <div class="registration-topline">
+              <span>Registration</span>
+              <span class="availability-dot" [class.is-closed]="!canRegister()">
+                <i aria-hidden="true"></i>{{ canRegister() ? 'Open' : 'Closed' }}
+              </span>
+            </div>
+            <p class="ticket-label">Entry / ticket</p>
+            <p class="ticket-price">{{ ticketLabel() }}</p>
+            <p class="ticket-note">{{ event()!.ticket?.isFree ? 'Free entry - register so we can plan for you.' : 'Price per ticket. You can choose how many tickets on the next page.' }}</p>
+
+            @if (canRegister()) {
+              <a class="button button-primary button-full"
+                 [routerLink]="['/register']"
+                 [queryParams]="{ eventId: event()!.id }">Register for this event</a>
+            } @else {
+              <button class="button button-primary button-full" type="button" disabled>Registration closed</button>
+            }
+            <p class="registration-disclaimer">Registration records are stored in MySQL through the charity events API.</p>
+          </div>
+
+          <div class="progress-card">
+            <div class="progress-heading">
+              <div><p class="kicker">Fundraising progress</p><h2>{{ percent() }}%</h2></div>
+              <span>{{ progressLabel() }}</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-label="Fundraising progress"
+                 aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent()">
+              <span [style.width.%]="percent()"></span>
+            </div>
+            <div class="progress-amounts">
+              <p><span>Raised</span><strong>{{ formatCurrency(event()!.fundraising?.raised, event()!.ticket?.currency) }}</strong></p>
+              <p><span>Goal</span><strong>{{ formatCurrency(event()!.fundraising?.goal, event()!.ticket?.currency) }}</strong></p>
+            </div>
+          </div>
+
+          <div class="event-info-card">
+            <h2>Event details</h2>
+            <dl>
+              <div><dt>Date</dt><dd>{{ longDate() }}</dd></div>
+              <div><dt>Time</dt><dd>{{ timeRange() }}</dd></div>
+              <div><dt>Venue</dt><dd>{{ event()!.venue?.name }}</dd></div>
+              <div><dt>Address</dt><dd>{{ event()!.venue?.addressLine1 }}, {{ event()!.venue?.suburb }}</dd></div>
+              <div><dt>Capacity</dt><dd>{{ event()!.capacity ? formatNumber(event()!.capacity) : 'Not limited' }}</dd></div>
+              <div><dt>Organiser</dt><dd>{{ event()!.organisation?.name }}</dd></div>
+              <div><dt>Status</dt><dd>{{ statusLabel() }}</dd></div>
+            </dl>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </article>
+}

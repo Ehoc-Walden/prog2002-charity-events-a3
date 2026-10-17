@@ -1,0 +1,241 @@
+<!--
+  Staff dashboard.
+
+  This template only draws what the component already holds: the rows, the
+  `meta.summary` counters and the pagination block all arrive in the same JSON
+  response from `GET /api/events`. Nothing is calculated a second time in the
+  browser, so the tiles and the table can never disagree.
+-->
+<section class="shell">
+  <div class="console-head">
+    <div>
+      <p class="eyebrow">Dashboard</p>
+      <h1>Every event, <em>one console.</em></h1>
+      <p>
+        Search, filter, edit and retire the events that the public website is showing.
+        Every row below is read live from MySQL through the Node API, so the console
+        and the website always share one source of truth.
+      </p>
+    </div>
+    <div class="button-row">
+      <a class="button button-primary" routerLink="/events/new">New event</a>
+      <button class="button button-quiet" type="button" (click)="load()" [disabled]="loading()">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (notice(); as message) {
+    <div
+      class="notice"
+      [class.notice-success]="message.tone === 'success'"
+      [class.notice-warn]="message.tone === 'warn'"
+      [class.notice-error]="message.tone === 'error'"
+      role="status">
+      <p><span class="notice-title">{{ message.title }}.</span> {{ message.message }}</p>
+      <button class="text-button" type="button" (click)="notice.set(null)">Dismiss</button>
+    </div>
+  }
+
+  @if (pendingDelete(); as target) {
+    <div class="notice notice-warn" role="alert">
+      <div>
+        <p><span class="notice-title">Delete &ldquo;{{ target.title }}&rdquo;?</span> This cannot be undone.</p>
+        <p>
+          Events that already have registrations are protected, and the API will refuse the
+          delete with a 409 response rather than silently removing attendee records.
+        </p>
+      </div>
+      <div class="button-row">
+        <button class="button button-danger" type="button" (click)="confirmDelete()" [disabled]="busyId() === target.id">
+          Yes, delete it
+        </button>
+        <button class="button button-quiet" type="button" (click)="cancelDelete()">Keep it</button>
+      </div>
+    </div>
+  }
+
+  @if (tiles().length > 0) {
+    <ul class="stat-grid">
+      @for (tile of tiles(); track tile.filter) {
+        <li>
+          <button
+            class="stat-card stat-card-button"
+            type="button"
+            [class.is-selected]="statusFilter() === tile.filter"
+            [attr.aria-pressed]="statusFilter() === tile.filter"
+            (click)="selectStatus(tile.filter)">
+            <span class="stat-value">{{ tile.value }}</span>
+            <span class="stat-label">{{ tile.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  <form class="filter-bar" (submit)="applyFilters($event)">
+    <div class="form-field">
+      <label for="status-filter">Status</label>
+      <select id="status-filter" [value]="statusFilter()" (change)="selectStatus($any($event.target).value)">
+        @for (option of statusFilters; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-field">
+      <label for="search-term">Search title or summary</label>
+      <input
+        id="search-term"
+        type="search"
+        maxlength="80"
+        placeholder="e.g. harbour"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)">
+    </div>
+    <div class="form-field">
+      <label for="sort-order">Sort by</label>
+      <select id="sort-order" [value]="sortOrder()" (change)="applySort($any($event.target).value)">
+        @for (option of sortOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button class="button button-primary" type="submit" [disabled]="loading()">Apply filters</button>
+      <button class="button button-quiet" type="button" (click)="clearFilters()">Clear</button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="loading-line"><span class="spinner" aria-hidden="true"></span> Loading events&hellip;</div>
+  } @else if (error(); as message) {
+    <div class="inline-error" role="alert">
+      <p>{{ message }} <button class="text-link" type="button" (click)="load()">Try again</button></p>
+    </div>
+  } @else if (events().length === 0) {
+    <div class="console-empty">
+      <h3>No events match those filters</h3>
+      <p>
+        Nothing in the catalogue fits this combination of status and search text.
+        Clear the filters to see the whole list, or create the first event.
+      </p>
+      <div class="button-row">
+        <button class="button button-quiet" type="button" (click)="clearFilters()">Clear filters</button>
+        <a class="button button-primary" routerLink="/events/new">New event</a>
+      </div>
+    </div>
+  } @else {
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Event catalogue</h2>
+          <p>{{ rangeLabel() }}</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <caption class="visually-hidden">All charity events, with status, venue, price and tickets sold</caption>
+          <thead>
+            <tr>
+              <th scope="col">Event</th>
+              <th scope="col">When</th>
+              <th scope="col">Venue</th>
+              <th scope="col">Ticket</th>
+              <th scope="col">Fundraising</th>
+              <th scope="col">Tickets sold</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (event of events(); track event.id) {
+              <tr [class.is-blocked]="blockedId() === event.id">
+                <td>
+                  <span class="table-title">
+                    <a [routerLink]="['/events', event.id, 'edit']">{{ event.title }}</a>
+                  </span>
+                  <span class="table-sub">{{ event.category?.name }} &middot; #{{ event.id }}</span>
+                </td>
+                <td class="cell-narrow">
+                  {{ dateLabel(event.startDateTime) }}
+                  <span class="table-sub">{{ timeLabel(event) }}</span>
+                </td>
+                <td>
+                  {{ event.venue?.name }}
+                  <span class="table-sub">{{ event.venue?.suburb }} {{ event.venue?.stateCode }}</span>
+                </td>
+                <td class="cell-narrow">
+                  @if (event.ticket?.isFree) {
+                    Free
+                  } @else {
+                    {{ priceLabel(event) }}
+                  }
+                  <span class="table-sub">{{ event.ticket?.currency }}</span>
+                </td>
+                <td class="cell-narrow">{{ moneyLabel(event) }}</td>
+                <td class="cell-narrow">
+                  {{ event.ticketsSold ?? 0 }}
+                  <span class="table-sub">{{ event.registrationCount ?? 0 }} registration(s)</span>
+                </td>
+                <td>
+                  <span [class]="statusClass(event)">{{ statusLabel(event) }}</span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <a class="button button-quiet" [routerLink]="['/events', event.id, 'edit']">Edit</a>
+                    <button
+                      class="button button-danger"
+                      type="button"
+                      (click)="askToDelete(event)"
+                      [disabled]="busyId() === event.id">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <p class="table-sub">{{ rangeLabel() }}</p>
+        <div class="pagination-list" role="group" aria-label="Event pages">
+          <button
+            class="pagination-link"
+            type="button"
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="currentPage() === 1">
+            <span aria-hidden="true">&larr;</span> Previous
+          </button>
+          @for (page of pageNumbers(); track page) {
+            <button
+              class="pagination-link"
+              type="button"
+              [class.is-current]="page === currentPage()"
+              [attr.aria-current]="page === currentPage() ? 'page' : null"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+          <button
+            class="pagination-link"
+            type="button"
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="currentPage() === totalPages()">
+            Next <span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+        <div class="form-field">
+          <label for="page-size">Rows per page</label>
+          <select id="page-size" [value]="pageSize()" (change)="changePageSize($any($event.target).value)">
+            @for (size of pageSizes; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  }
+</section>

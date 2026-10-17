@@ -1,0 +1,25 @@
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <img src="assets/common-ground-mark.svg" alt="" width="44" height="44">
+      <h2>{{ siteName }}</h2>
+      <p>{{ consoleName }} - internal administration.</p>
+    </div>
+    <div>
+      <h3>Console</h3>
+      <a routerLink="/">Dashboard</a>
+      <a routerLink="/events/new">New event</a>
+      <a routerLink="/categories">Categories</a>
+    </div>
+    <div>
+      <h3>Support</h3>
+      <a href="mailto:staff@commonground.org.au">staff@commonground.org.au</a>
+      <a href="tel:+61255500142">+61 2 5550 0142</a>
+      <p>Gadigal Country, Sydney NSW</p>
+    </div>
+    <div class="footer-note">
+      <p>This console was created for the PROG2002 Assessment 3 case study. Events, venues and contact details are fictional.</p>
+      <p>&copy; {{ year }} {{ siteName }}.</p>
+    </div>
+  </div>
+</footer>

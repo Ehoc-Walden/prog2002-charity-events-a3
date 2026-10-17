@@ -1,0 +1,35 @@
+<article class="event-card">
+  <div class="event-card-media">
+    <img [src]="coverPath" [alt]="event.title + ' event cover'" loading="lazy">
+    <div class="event-card-date">
+      <strong>{{ dateParts.day }}</strong><span>{{ dateParts.month }}</span>
+    </div>
+    <span class="event-card-status" [class.is-free]="event.ticket?.isFree">{{ statusLabel }}</span>
+  </div>
+  <div class="event-card-body">
+    <div class="event-card-tags">
+      <span class="tag tag-accent">{{ event.category?.name || 'Community' }}</span>
+      <span class="tag">{{ mediumDate }}</span>
+      <span class="tag tag-status" [class.is-past]="event.isPast" [class.is-upcoming]="!event.isPast">
+        {{ event.isPast ? 'Past' : 'Upcoming' }}
+      </span>
+    </div>
+    <h3>{{ event.title }}</h3>
+    <p class="event-card-location"><span aria-hidden="true">⌖</span>{{ location }}</p>
+    <div class="mini-progress">
+      <div class="mini-progress-head">
+        <span>Raised {{ raisedLabel }}</span>
+        <span>{{ percent }}% of goal</span>
+      </div>
+      <div class="progress-rail" role="progressbar"
+           [attr.aria-label]="'Fundraising progress for ' + event.title"
+           aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="percent">
+        <span [style.width.%]="percent"></span>
+      </div>
+    </div>
+    <div class="event-card-footer">
+      <p class="event-card-price">Entry<strong>{{ ticketLabel }}</strong></p>
+      <a class="card-link" [routerLink]="['/events', event.id]">View details <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</article>

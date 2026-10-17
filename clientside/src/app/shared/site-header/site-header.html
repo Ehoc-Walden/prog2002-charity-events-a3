@@ -1,0 +1,13 @@
+<header class="site-header" [class.site-header-solid]="solid" [class.is-scrolled]="scrolled()">
+  <div class="shell header-inner">
+    <a class="brand" routerLink="/" aria-label="Common Ground Collective home">
+      <img src="assets/common-ground-mark.svg" alt="" width="44" height="44">
+      <span class="brand-copy"><strong>Common Ground</strong><small>Collective</small></span>
+    </a>
+    <button class="nav-toggle" type="button" [attr.aria-expanded]="navOpen()" aria-controls="primary-nav" (click)="toggleNav()">
+      <span class="nav-toggle-label">Menu</span>
+      <span class="nav-toggle-icon" aria-hidden="true"><i></i><i></i></span>
+    </button>
+    <app-site-nav [open]="navOpen()" (followed)="closeNav()"></app-site-nav>
+  </div>
+</header>

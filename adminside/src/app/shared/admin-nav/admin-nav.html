@@ -1,0 +1,23 @@
+<nav class="primary-nav" id="console-nav" aria-label="Staff console navigation" [class.is-open]="open">
+  <a
+    routerLink="/"
+    routerLinkActive="is-active"
+    #dashboard="routerLinkActive"
+    [routerLinkActiveOptions]="{ exact: true }"
+    [attr.aria-current]="dashboard.isActive ? 'page' : null"
+    (click)="close()">Dashboard</a>
+  <a
+    routerLink="/events/new"
+    routerLinkActive="is-active"
+    #newEvent="routerLinkActive"
+    [routerLinkActiveOptions]="{ exact: true }"
+    [attr.aria-current]="newEvent.isActive ? 'page' : null"
+    (click)="close()">New event</a>
+  <a
+    routerLink="/categories"
+    routerLinkActive="is-active"
+    #categories="routerLinkActive"
+    [attr.aria-current]="categories.isActive ? 'page' : null"
+    (click)="close()">Categories</a>
+  <a [href]="publicSiteUrl">Public site</a>
+</nav>

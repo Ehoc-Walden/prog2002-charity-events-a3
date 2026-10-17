@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Winter Sleepout</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#171C2E"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5268B6" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#E4A853" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 629c216-177 401-176 566-16s336 150 634-24v211H0Z" fill="#5268B6" opacity=".9"/>
+    <path d="M168 226l72 78-72 78-72-78 72-78Zm255-82l92 101-92 101-92-101 92-101Zm310 132l67 72-67 72-67-72 67-72Z" fill="#E4A853"/>
+    <path d="M775 503c0-78 63-141 141-141s141 63 141 141v188H775Z" fill="#D7E2F1" opacity=".82"/>
+    <path d="M916 362v329M775 503h282" stroke="#171C2E" stroke-width="18" opacity=".72"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#D7E2F1" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#171C2E"/>
+    <path d="M28 51V31" stroke="#171C2E" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#D7E2F1" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

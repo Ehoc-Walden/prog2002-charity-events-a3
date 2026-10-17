@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Coastline Community Walk</title>
+  <desc id="desc">Abstract editorial artwork in the Common Ground charity event visual system.</desc>
+  <rect width="1200" height="800" fill="#0E5560"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#grain)" opacity=".13"/>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#fff" opacity=".35"/>
+      <circle cx="17" cy="13" r="1" fill="#fff" opacity=".18"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#57C7B8" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#F8D15B" stop-opacity=".66"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-40 520c178-153 311-50 456 19s255 38 417-75 248-73 407-11" stroke="url(#fade)" stroke-width="116"/>
+    <path d="M-10 588c205-104 340-26 500 44s287 28 447-71 231-72 323-41" stroke="#F7F0DE" stroke-width="22" stroke-dasharray="8 30"/>
+    <circle cx="939" cy="235" r="126" fill="#F8D15B"/>
+    <path d="M842 250c58-21 112-8 161 38-55 49-108 60-161 34v-72Z" fill="#57C7B8"/>
+    <path d="M948 237c-5 35 12 63 52 83" stroke="#0E5560" stroke-width="10"/>  </g>
+  <g transform="translate(56 58)">
+    <circle cx="28" cy="28" r="27" fill="#F7F0DE" opacity=".96"/>
+    <path d="M14 30c6-14 18-18 29-9-4 14-15 20-29 9Z" fill="#0E5560"/>
+    <path d="M28 51V31" stroke="#0E5560" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="118" y="98" fill="#F7F0DE" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="4">COMMON GROUND</text>
+</svg>

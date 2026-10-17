@@ -1,0 +1,168 @@
+<!-- Home page body. The header, nav and footer come from the root shell. -->
+<section class="home-hero">
+  <div class="hero-grid-lines" aria-hidden="true"></div>
+  <div class="shell hero-layout">
+    <div class="hero-copy reveal">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>Sydney &middot; 2026 giving season</p>
+      <h1>Show up for the city <em>we share.</em></h1>
+      <p class="hero-lede">Find a run, dinner, gig or hands-on community event doing practical good across Sydney. Bring your people. We will show you where the support goes.</p>
+      <div class="button-row">
+        <a class="button button-primary" routerLink="/search">Explore events <span aria-hidden="true">&#8599;</span></a>
+        <a class="button button-quiet" routerLink="/search">Search by date or suburb</a>
+      </div>
+      <dl class="hero-proof" aria-label="Common Ground at a glance">
+        <div><dt>{{ upcomingCount() }}</dt><dd>upcoming events</dd></div>
+        <div><dt>5</dt><dd>local cause areas</dd></div>
+        <div><dt>100%</dt><dd>funds traced to programs</dd></div>
+      </dl>
+    </div>
+
+    <div class="city-thread reveal reveal-delay" aria-labelledby="city-thread-title">
+      <div class="thread-heading">
+        <div>
+          <p class="kicker">The city thread</p>
+          <h2 id="city-thread-title">What is happening next</h2>
+        </div>
+        <span class="live-pill"><i aria-hidden="true"></i>Live from API</span>
+      </div>
+
+      <div class="thread-line" aria-live="polite">
+        @if (loading()) {
+          <div class="thread-skeleton"><span></span><span></span><span></span></div>
+        } @else if (thread().length === 0) {
+          <p class="thread-empty">No published events yet. Check back soon.</p>
+        } @else {
+          @for (event of thread(); track event.id) {
+            <a class="thread-item" [routerLink]="['/events', event.id]">
+              <span class="thread-marker" aria-hidden="true"><i></i></span>
+              <span class="thread-body">
+                <strong>{{ event.title }}</strong>
+                <small>{{ threadDate(event) }} &middot; {{ threadTime(event) }} &middot; {{ event.venue?.suburb || 'Sydney' }}</small>
+              </span>
+              <span class="thread-tag">{{ event.category?.name || 'Community' }}</span>
+            </a>
+          }
+        }
+      </div>
+
+      <div class="thread-footer">
+        <p>Every marker is a real event from the charity events database.</p>
+        <a routerLink="/search">View all events <span aria-hidden="true">&#8594;</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="impact-strip" aria-label="Current fundraising snapshot">
+  <div class="shell impact-strip-inner">
+    <div class="impact-amount">
+      <span class="amount-mark" aria-hidden="true">$</span>
+      <div><strong>{{ loading() ? '\u2014' : raisedLabel() }}</strong><span>raised across upcoming events</span></div>
+    </div>
+    <div class="impact-note">
+      <span class="pulse-ring" aria-hidden="true"></span>
+      <p><strong>Progress is public.</strong> Goal and fundraising figures are read live from the event database.</p>
+    </div>
+  </div>
+</section>
+
+<section class="mission-section section" id="about">
+  <div class="shell split-heading">
+    <div>
+      <p class="eyebrow">Why Common Ground</p>
+      <h2>Local problems need <em>local momentum.</em></h2>
+    </div>
+    <p class="section-intro">We connect the energy of a great event with the consistency of local programs. That means fewer one-off gestures and more useful, lasting support.</p>
+  </div>
+  <div class="shell cause-grid">
+    <article class="cause-card cause-card-orange">
+      <span class="cause-number">01</span>
+      <div class="cause-icon" aria-hidden="true">&#8962;</div>
+      <h3>Safe housing</h3>
+      <p>Emergency accommodation, case support and practical help for people facing housing insecurity.</p>
+    </article>
+    <article class="cause-card cause-card-teal">
+      <span class="cause-number">02</span>
+      <div class="cause-icon" aria-hidden="true">&#9678;</div>
+      <h3>Food security</h3>
+      <p>Fresh meal packs and dependable food relief for families across Greater Sydney.</p>
+    </article>
+    <article class="cause-card cause-card-gold">
+      <span class="cause-number">03</span>
+      <div class="cause-icon" aria-hidden="true">&#8599;</div>
+      <h3>Youth opportunity</h3>
+      <p>Mentoring, creative programs and paid pathways into first jobs.</p>
+    </article>
+    <article class="cause-card cause-card-blue">
+      <span class="cause-number">04</span>
+      <div class="cause-icon" aria-hidden="true">&#8779;</div>
+      <h3>Coastal care</h3>
+      <p>Cleaner waterways, restored habitat and practical environmental education.</p>
+    </article>
+  </div>
+</section>
+
+<section class="events-section section" id="impact">
+  <div class="shell events-heading">
+    <div>
+      <p class="eyebrow">Upcoming with heart</p>
+      <h2>Choose the moment <em>that moves you.</em></h2>
+    </div>
+    <p class="section-intro">These are the next published events, loaded directly from the REST API. Suspended and cancelled events never appear here.</p>
+  </div>
+
+  <div class="shell">
+    @if (error()) {
+      <div class="inline-error" role="alert">
+        <p>{{ error() }}</p>
+        <button class="button button-dark" type="button" (click)="load()">Try again</button>
+      </div>
+    }
+
+    <div class="event-grid" aria-live="polite">
+      @if (loading()) {
+        <article class="event-card event-card-skeleton"></article>
+        <article class="event-card event-card-skeleton"></article>
+        <article class="event-card event-card-skeleton"></article>
+      } @else if (featured().length === 0 && !error()) {
+        <div class="empty-state">
+          <h3>No events published yet.</h3>
+          <p>New charity events appear here as soon as an administrator publishes them.</p>
+        </div>
+      } @else {
+        @for (event of featured(); track event.id) {
+          <app-event-card [event]="event"></app-event-card>
+        }
+      }
+    </div>
+
+    <div class="section-action">
+      <a class="text-link text-link-large" routerLink="/search">Search the full event calendar <span aria-hidden="true">&#8594;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="clarity-section section" id="how-it-works">
+  <div class="shell clarity-layout">
+    <div class="clarity-copy">
+      <p class="eyebrow">Give with clarity</p>
+      <h2>Good intentions deserve <em>good evidence.</em></h2>
+      <p>Each event has a defined purpose, fundraising target and progress figure. You can see what is being funded before you decide to take part.</p>
+      <a class="button button-dark" routerLink="/search">Find an event near you</a>
+    </div>
+    <ol class="clarity-steps">
+      <li><span>01</span><div><strong>Choose an event</strong><p>Filter by date, suburb or category.</p></div></li>
+      <li><span>02</span><div><strong>See the target</strong><p>Compare the goal with funds raised so far.</p></div></li>
+      <li><span>03</span><div><strong>Join the effort</strong><p>Register, attend and keep the work moving.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="closing-cta">
+  <div class="shell closing-cta-inner">
+    <p class="eyebrow eyebrow-light">Your next good thing</p>
+    <h2>One city. Many ways<br>to make a difference.</h2>
+    <a class="button button-light" routerLink="/search">Browse charity events <span aria-hidden="true">&#8594;</span></a>
+  </div>
+  <div class="closing-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+</section>

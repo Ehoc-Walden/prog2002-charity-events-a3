@@ -1,0 +1,160 @@
+<!-- Registration page body (new in Assessment 3). -->
+<section class="page-hero register-hero">
+  <div class="shell page-hero-grid">
+    <div>
+      <p class="eyebrow">Event registration</p>
+      <h1>Reserve your place <em>and bring your people.</em></h1>
+      <p>Complete the details below. Your registration is saved to the charity events database and you will receive a reference code straight away.</p>
+    </div>
+    <div class="page-hero-aside">
+      <span>Secure your tickets</span>
+      <p>Registration calls <code>POST /api/events/:id/registrations</code>. The API re-checks every rule, so the record is always valid.</p>
+    </div>
+  </div>
+  <div class="search-route" aria-hidden="true"></div>
+</section>
+
+<section class="register-section section">
+  <div class="shell">
+    @if (loading()) {
+      <div class="event-loading" aria-live="polite">
+        <div class="loading-orb" aria-hidden="true"></div>
+        <p>Loading the event&hellip;</p>
+      </div>
+    } @else if (confirmation()) {
+      <div class="confirmation-card" role="status">
+        <div class="confirmation-mark" aria-hidden="true">&#10003;</div>
+        <p class="eyebrow">Registration confirmed</p>
+        <h2>Thank you, {{ firstName() }}.</h2>
+        <p>Your place at <strong>{{ event()!.title }}</strong> is booked. Keep this reference code for the day.</p>
+        <p class="reference-code reference-code-large">{{ confirmation()!.referenceCode }}</p>
+        <dl class="confirmation-facts">
+          <div><dt>Event</dt><dd>{{ event()!.title }}</dd></div>
+          <div><dt>Date</dt><dd>{{ longDate() }}</dd></div>
+          <div><dt>Time</dt><dd>{{ timeRange() }}</dd></div>
+          <div><dt>Venue</dt><dd>{{ event()!.venue?.name }}, {{ event()!.venue?.suburb }}</dd></div>
+          <div><dt>Tickets</dt><dd>{{ ticketQuantity() }}</dd></div>
+          <div><dt>Total</dt><dd>{{ confirmation()!.totalCost > 0 ? formatCurrency(confirmation()!.totalCost, confirmation()!.currency) : 'Free' }}</dd></div>
+        </dl>
+        <div class="button-row">
+          <a class="button button-primary" [routerLink]="['/events', event()!.id]">Back to the event</a>
+          <button class="button button-quiet" type="button" (click)="registerAnother()">Register someone else</button>
+        </div>
+      </div>
+    } @else if (error() && !event()) {
+      <div class="event-error">
+        <p class="eyebrow">Registration unavailable</p>
+        <h1>We could not start your registration.</h1>
+        <p>{{ error() }}</p>
+        <a class="button button-dark" routerLink="/search">Find an event</a>
+      </div>
+    } @else {
+      <div class="register-layout">
+        <div class="register-form-panel">
+          <div class="filter-heading">
+            <div><p class="kicker">Your details</p><h2>Registration form</h2></div>
+          </div>
+
+          @if (error()) {
+            <div class="inline-error" role="alert"><p>{{ error() }}</p></div>
+          }
+
+          <form (submit)="$event.preventDefault(); submit()" novalidate>
+            <div class="form-row">
+              <div class="field-group">
+                <label for="reg-first-name">First name <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="reg-first-name" name="firstName" type="text" autocomplete="given-name"
+                       [value]="firstName()" (input)="onFirstName($any($event.target).value)"
+                       [attr.aria-invalid]="hasError('firstName') ? 'true' : null"
+                       [attr.aria-describedby]="hasError('firstName') ? 'err-first-name' : null">
+                @if (hasError('firstName')) { <p class="field-error" id="err-first-name" role="alert">{{ fieldErrors()['firstName'] }}</p> }
+              </div>
+              <div class="field-group">
+                <label for="reg-last-name">Last name <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="reg-last-name" name="lastName" type="text" autocomplete="family-name"
+                       [value]="lastName()" (input)="onLastName($any($event.target).value)"
+                       [attr.aria-invalid]="hasError('lastName') ? 'true' : null"
+                       [attr.aria-describedby]="hasError('lastName') ? 'err-last-name' : null">
+                @if (hasError('lastName')) { <p class="field-error" id="err-last-name" role="alert">{{ fieldErrors()['lastName'] }}</p> }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label for="reg-email">Email <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="reg-email" name="email" type="email" autocomplete="email"
+                       [value]="email()" (input)="onEmail($any($event.target).value)"
+                       [attr.aria-invalid]="hasError('email') ? 'true' : null"
+                       [attr.aria-describedby]="hasError('email') ? 'err-email' : 'email-hint'">
+                @if (hasError('email')) {
+                  <p class="field-error" id="err-email" role="alert">{{ fieldErrors()['email'] }}</p>
+                } @else {
+                  <p class="field-hint" id="email-hint">Your tickets and reference code are sent here.</p>
+                }
+              </div>
+              <div class="field-group">
+                <label for="reg-phone">Phone <span class="optional-mark">optional</span></label>
+                <input id="reg-phone" name="phone" type="tel" autocomplete="tel"
+                       [value]="phone()" (input)="onPhone($any($event.target).value)"
+                       [attr.aria-invalid]="hasError('phone') ? 'true' : null"
+                       [attr.aria-describedby]="hasError('phone') ? 'err-phone' : null">
+                @if (hasError('phone')) { <p class="field-error" id="err-phone" role="alert">{{ fieldErrors()['phone'] }}</p> }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label for="reg-tickets">Number of tickets <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="reg-tickets" name="ticketQuantity" type="number" min="1" max="100" step="1"
+                       [value]="ticketQuantity()" (input)="onTickets($any($event.target).value)"
+                       [attr.aria-invalid]="hasError('ticketQuantity') ? 'true' : null"
+                       [attr.aria-describedby]="hasError('ticketQuantity') ? 'err-tickets' : null">
+                @if (hasError('ticketQuantity')) { <p class="field-error" id="err-tickets" role="alert">{{ fieldErrors()['ticketQuantity'] }}</p> }
+              </div>
+              <div class="field-group ticket-preview">
+                <span class="preview-label">Total cost</span>
+                <strong class="preview-value">{{ totalLabel() }}</strong>
+                <span class="preview-note">{{ ticketLabel() }} per ticket</span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="reg-notes">Notes <span class="optional-mark">optional</span></label>
+              <textarea id="reg-notes" name="notes" rows="3" maxlength="255"
+                        [value]="notes()" (input)="onNotes($any($event.target).value)"
+                        [attr.aria-invalid]="hasError('notes') ? 'true' : null"
+                        placeholder="Accessibility needs, dietary requirements, questions&hellip;"></textarea>
+              @if (hasError('notes')) { <p class="field-error" role="alert">{{ fieldErrors()['notes'] }}</p> }
+            </div>
+
+            <div class="filter-actions">
+              <button class="button button-primary button-full" type="submit" [disabled]="submitting()">
+                {{ submitting() ? 'Saving your registration\u2026' : 'Confirm registration' }}
+              </button>
+              <a class="button button-quiet button-full" [routerLink]="['/events', event()!.id]">Back to the event</a>
+            </div>
+          </form>
+        </div>
+
+        <aside class="register-summary">
+          <div class="summary-card">
+            <img class="summary-cover" [src]="coverPath()" [alt]="event()!.title + ' event cover'">
+            <div class="summary-body">
+              <span class="tag tag-accent">{{ event()!.category?.name || 'Community' }}</span>
+              <h2>{{ event()!.title }}</h2>
+              <dl>
+                <div><dt>Date</dt><dd>{{ longDate() }}</dd></div>
+                <div><dt>Time</dt><dd>{{ timeRange() }}</dd></div>
+                <div><dt>Venue</dt><dd>{{ event()!.venue?.name }}</dd></div>
+                <div><dt>Address</dt><dd>{{ event()!.venue?.addressLine1 }}, {{ event()!.venue?.suburb }}</dd></div>
+                <div><dt>Entry</dt><dd>{{ ticketLabel() }}</dd></div>
+                <div><dt>Tickets purchased so far</dt><dd>{{ event()!.registrationSummary?.ticketsSold ?? 0 }}</dd></div>
+              </dl>
+              <p class="summary-note">{{ event()!.summary }}</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    }
+  </div>
+</section>

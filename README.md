@@ -1,4 +1,4 @@
-﻿# PROG2002 Assessment 3 - Charity Events (Common Ground Collective)
+# PROG2002 Assessment 3 - Charity Events (Common Ground Collective)
 
 **Student:** Zhiming Wei
 **Student ID:** 24832847
@@ -19,6 +19,16 @@ side by side:
 Both websites get **all** of their data through the API. Nothing is hard-coded
 in the pages, so a change saved in the admin console is visible on the public
 site after a refresh.
+
+## Supporting documentation
+
+| Document | What it covers |
+| --- | --- |
+| `docs/API_REFERENCE.md` | Endpoint list, response envelopes and error codes |
+| `docs/TROUBLESHOOTING.md` | MySQL, ports, `.env`, CORS and cross-machine setup problems |
+| `docs/TEST_EVIDENCE.md` | Verified test results, responsive sweep and final seed counts |
+| `docs/SECURITY_AND_DATA.md` | Parameterised SQL, validation, secrets and relational integrity |
+| `docs/DEVELOPMENT_WORKFLOW.md` | Team clone, commit, pull and review workflow |
 
 ---
 

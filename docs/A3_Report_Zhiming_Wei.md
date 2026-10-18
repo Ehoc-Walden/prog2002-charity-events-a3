@@ -1,4 +1,4 @@
-﻿# PROG2002 Web Development II - Assessment 3 Report
+# PROG2002 Web Development II - Assessment 3 Report
 
 | | |
 | --- | --- |
@@ -866,7 +866,7 @@ The Peer Evaluation form is submitted separately by email, as the brief requires
 
 | Team member | Repository evidence | Recorded contribution |
 | --- | --- | --- |
-| Zhiming Wei | Eight implementation/documentation commits under `2364041912@qq.com` | Database, API, both web clients, weather integration, tests, deployment, report and video |
+| Zhiming Wei | Multiple verified implementation/documentation commits under `2364041912@qq.com` | Database, API, both web clients, weather integration, tests, deployment, report and video |
 | Zhen Zhou | Two repository-access commits under `zresettingz4@qq.com` | Created and removed `test.txt` during the repository access check; no source-code contribution is claimed here |
 
 ### 13.1 Individual contribution statement (Zhiming Wei)

@@ -103,7 +103,7 @@
 > 409 Conflict，并带上解释删除被阻止原因的信息。"
 
 **【画面】** 浏览器打开 `localhost:3000/api`，再打开
-`localhost:3000/api/events/search?location=Newcastle&sort=date`。
+`localhost:3000/api/events/search?location=Sydney&sort=date_asc`。
 
 > "这个 API 是自带文档的：打开 `/api` 就能看到全部端点列表。这里是直接在浏览器
 > 里测试搜索端点——它就是搜索页用的那个端点。"

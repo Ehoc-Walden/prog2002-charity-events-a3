@@ -115,7 +115,7 @@ website, (3) live demonstration of the website functionality.
 > message that explains why the delete was blocked."
 
 **Show on screen:** browser at `localhost:3000/api`, then
-`localhost:3000/api/events/search?location=Newcastle&sort=date`.
+`localhost:3000/api/events/search?location=Sydney&sort=date_asc`.
 
 > "The API is self-documenting. If you open `/api` you get the full list of
 > endpoints. And here is the search endpoint being tested straight in the

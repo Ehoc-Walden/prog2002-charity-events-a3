@@ -1,4 +1,4 @@
-﻿**/node_modules/
+**/node_modules/
 **/.env
 *.log
 api/.npm-cache/
@@ -9,3 +9,5 @@ report_a3_render_check/
 /test-spa-server.js
 **/dist-browser/
 **/dist-ngc/
+cpanel_deploy_build/
+.a3-shot-work/

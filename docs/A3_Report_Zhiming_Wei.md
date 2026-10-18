@@ -218,7 +218,7 @@ considered.
 | Store registrations as a JSON column on `events` | Rejected. It cannot enforce uniqueness, cannot be indexed for the "newest first" sort, and would defeat the foreign key that protects the data. |
 | **A separate `registrations` table with a foreign key** | **Accepted.** It models the one-to-many relationship directly, and MySQL itself enforces the rules. |
 
-### 5.3 The `registrations` table
+### 5.3 The registrations table
 
 | Column | Type | Purpose |
 | --- | --- | --- |
@@ -304,7 +304,7 @@ All routes are mounted under `/api`. Responses always use the envelope
 | GET | `/api/weather?latitude=&longitude=` | Weather proxy for any coordinate |
 | GET | `/api/weather/events/:eventId` | Weather for an event's venue, resolved server side |
 
-### 6.2 One endpoint in detail: `POST /api/events/:eventId/registrations`
+### 6.2 One endpoint in detail: POST /api/events/:eventId/registrations
 
 This is the endpoint at the centre of Assessment 3, so it is described fully.
 
@@ -864,46 +864,29 @@ code and the database schema were the source of truth, not the conversation.
 Teamwork is worth 15% of this assessment, so this section states who did what.
 The Peer Evaluation form is submitted separately by email, as the brief requires.
 
-| Team member | Student ID | Contribution |
+| Team member | Repository evidence | Recorded contribution |
 | --- | --- | --- |
-| Zhiming Wei | 24832847 | Database schema and seed data, the whole Express API, the public registration page and event-detail changes, the admin console, the weather integration, the report and the demonstration video |
-| `銆怚NSERT PARTNER NAME銆慲 | `銆怚NSERT PARTNER ID銆慲 | `銆怚NSERT PARTNER CONTRIBUTION銆慲 |
+| Zhiming Wei | Eight implementation/documentation commits under `2364041912@qq.com` | Database, API, both web clients, weather integration, tests, deployment, report and video |
+| Zhen Zhou | Two repository-access commits under `zresettingz4@qq.com` | Created and removed `test.txt` during the repository access check; no source-code contribution is claimed here |
 
 ### 13.1 Individual contribution statement (Zhiming Wei)
 
-I was responsible for the end-to-end technical delivery of the submission:
+I was responsible for the end-to-end technical delivery of the submission.
 
-1. **Database (5%).** Designed and wrote the new `registrations` table, extended
-   the `venues` table with coordinates, and rebuilt `schema.sql` so that a single
-   import creates the database, the tables, the low-privilege `charity_app`
-   account and its grants.
-2. **API (10%).** Built the Express server and every resource router, including
-   the full event CRUD, the event-by-ID response that includes its registrations,
-   the delete that is refused with a 409 when registrations exist, and the weather
-   proxy. Wrote the shared validation layer and the parameterised query builder,
-   and the 29 automated tests around them.
-3. **Public website (30%).** Built the Angular registration page and the
-   "who has registered" table on the event detail page, and kept the Assessment 2
-   pages working under the new visual language and the new client framework.
-4. **Admin console (30%).** Built the staff console: the status-agnostic
-   dashboard, the create and update forms with client-side validation that
-   mirrors the server, the delete with clear blocked feedback, the category
-   manager, and the navigation shell that appears on every page.
-5. **Concept understanding (10%).** Wrote the code comments, the README, this
-   report, and the video script, and recorded the walkthrough.
-6. **External API.** Added the optional Open-Meteo weather feature, including
-   caching, timeouts and the WMO code translation.
+| Area | Weight | Contribution |
+| --- | --- | --- |
+| Database | 5% | Designed the `registrations` table, added venue coordinates, and rebuilt `schema.sql` so one import creates the database, tables and low-privilege application account. |
+| API | 10% | Built the Express server and resource routers, including event CRUD, registration validation, parameterised SQL, the 409 delete guard and the weather proxy; wrote 29 automated tests. |
+| Public website | 30% | Built the Angular registration page and the "who has registered" table, while retaining the Assessment 2 pages under the new visual language. |
+| Admin console | 30% | Built the status-aware dashboard, create/update forms, blocked-delete feedback, category manager and shared navigation shell. |
+| Concept understanding | 10% | Wrote the code comments, README, report and video script, and recorded the walkthrough. |
+| External API | Optional | Added Open-Meteo weather with coordinate lookup, ten-minute caching, timeouts and WMO code translation. |
 
 ### 13.2 Working together
 
-The two members agreed the interface between their parts early: the exact JSON
-shape of an event, the endpoint names, and which fields the client would send.
-Because both websites talk to the API only through one service file, each person
-could work on a screen without waiting for the other, and a change to the API
-was visible to both immediately.
+The GitHub history records two collaborator accounts. All substantive application commits belong to Zhiming Wei; Zhen Zhou's recorded changes are limited to the repository-access test described above. Commit volume is not treated as a substitute for individual engagement: the confidential Peer Evaluation form is the authoritative place for each member's contribution and teamwork rating.
 
-**Figure 21 - Proof of collaboration.**
-`銆怚NSERT SCREENSHOT: chat or planning notes between the team members銆慲
+The API contract - the event JSON shape and endpoint names - was fixed early, and both clients use one service file, so a contract change can be checked from either client without duplicated request logic.
 
 ---
 
